@@ -1,0 +1,370 @@
+
+!!section banner
+ #####   #####   #####   #####     #     #####    ###
+#     # #     # #     # #     #   ##    #     #  #   #
+      #       # #     # #        # #    #     # # #   #
+ #####   #####   #####  ######     #     #####  #  #  #
+      #       # #     # #     #    #    #     # #   # #
+#     # #     # #     # #     #    #    #     #  #   #
+ #####   #####   #####   #####   #####   #####    ###
+
+3386180 Teong, Shu Hao Ivan                     5543   COMPCS
+
+Submissions:-
+
+S 0     Fri Apr 10 22:16:13 2015        3386180 all prolog 0:-1
+
+Tue Apr 21 12:15:27 2015                ## williams.orchestra.cse.unsw.EDU.AU ##
+!!section listing
+mycode.pl
+===== check that code has no errors and no warnings =====
+
+===== end of check =====
+
+===============================================================================
+-rw-r----- 1 cs9414 cs9414 4822 Apr 21 12:15 student.pl
+===============================================================================
+
+     1  % Program:  mycode.pl
+     2  % Source:   Prolog
+     3  %
+     4  % Purpose:  This is the Assignment 1 program of COMP9414 where we write Prolog
+     5  %           procedures to perform some list and tree operations.
+     6  %
+     7  % Type:     Assignment 1 - Prolog Programming
+     8  %
+     9  % Written:  Shu Hao Ivan Teong z3386180
+    10
+    11
+    12
+    13  % QUESTION 1:
+    14  % sumsq_div3or5(Numbers, Sum) :- Sums squares of only numbers divisible by 5
+    15  % or by 3, in a list of (positive or negative) whole numbers
+    16
+    17  % Using higher-order predicates and defined predicates of div and sqr in
+    18  % list with more than one element, first we filter numbers in list Numbers
+    19  % that is divisible by 3 and 5 using the include function into list L3 and
+    20  % list L5, as well as our defined predicate div, then merge the 2 lists into
+    21  % LF using append function. Then utilise the map function to square all the
+    22  % elements in list LF using our defined predicate which is sqr into list LF2,
+    23  % then add all the elements in list LF2 using the sumlist function
+    24
+    25  sumsq_div3or5(Numbers, Sum) :-
+    26      include(div(3), Numbers, L3),
+    27      include(div(5), Numbers, L5),
+    28      append(L3, L5, LF),
+    29      maplist(sqr, LF, LF2),
+    30      sumlist(LF2, Sum).
+                                 ^
+                                 + ==================================== +
+                                 + I think you might be double-counting +
+                                 + numbers that are divisible by 15.    +
+                                 + ==================================== +
+    31
+    32  div(N,M) :-
+    33      0 is M mod N.
+    34
+    35  sqr(X,Y) :-
+    36      Y is X * X.
+    37
+    38
+    39
+    40  % QUESTION 2:
+    41  % same_name(Person1, Person2) :- Both persons are sharing the same family name
+    42  %
+    43
+    44  % Person1 and Person2 have the same father
+    45  same_name(Person1, Person2) :-
+    46      parent(Parent, Person1),
+    47      parent(Parent, Person2),
+    48      male(Parent),
+    49      Person1 \= Person2.
+    50
+    51  % Person1 is the father of Person2
+    52  same_name(Person1, Person2) :-
+    53      parent(Person1, Person2),
+    54      male(Person1),
+    55      Person1 \= Person2.
+    56
+    57  % Person2 is the father of Person1
+    58  same_name(Person1, Person2) :-
+    59      parent(Person2, Person1),
+    60      male(Person2),
+    61      Person1 \= Person2.
+    62
+    63  % Person1 is the father of X, who
+    64  % is the father of Person2
+    65  same_name(Person1, Person2) :-
+    66      parent(Person1, X),
+    67      parent(X, Person2),
+    68      male(Person1),
+    69      male(X),
+    70      Person1 \= Person2.
+    71
+    72  % Person2 is the father of X, who
+    73  % is the father of Person1
+    74  same_name(Person1, Person2) :-
+    75      parent(Person2, X),
+    76      parent(X, Person1),
+    77      male(Person2),
+    78      male(X),
+    79      Person1 \= Person2.
+                               ^
++ ======================================================================== +
++ You need to recursively define a predicate like male_ancestor(),         +
++ so you can check whether Person1, Person2 have a common (male) ancestor. +
++ ======================================================================== +
+    80
+    81
+    82
+    83  % QUESTION 3:
+    84  % log_table(NumberList, ResultList) :- Binds ResultList to the list of pairs
+    85  % consisting of a number and its log, for each number in NumberList.
+    86
+    87  log_table(NumberList, ResultList) :-
+    88      maplist(lg, NumberList, LoggedList),
+    89      pair(NumberList, LoggedList, ResultList).
+    90
+    91  % Terminating conditions for pairing empty lists
+    92  pair([], [H|T], [H|T]).
+    93
+    94  pair(List, [], List).
+    95
+    96  % Recursive step for pairing non-empty lists
+    97  pair([H1|T1], [H2|T2], [[H1,H2]|T]) :-
+    98      pair(T1,T2,T).
+    99
+   100  % Defining a predicate for logged numbers to be used
+   101  lg(X,Y) :-
+   102      Y is log(X).
+   103
+   104
+   105
+   106
+   107  % QUESTION 4:
+   108  % runs(List, RunList) :- Write a predicate runs(List, RunList) that converts a
+   109  % list of numbers into the corresponding list of runs.
+   110
+   111  % Uses a cut to output an empty list if List is an empty list and stop it from
+   112  % backtracking
+   113  runs([], []):-!.
+   114
+   115  % For the list with more than 1 element, get the tail T of the list and put it
+   116  % into list T1, and then use the defined predicate ins to combine the head
+   117  % and the tail of the list into RunList output in the format and constraints
+   118  % created in the ins predicate recursively
+   119  runs([H|T], RunList):-
+   120      runs(T, T1),
+   121      ins(H, T1, RunList).
+   122
+   123  % Uses cut to stop the program from backtracking if head is variable A, tail is
+   124  % an empty list, and RunList output will be the variable A placed inside an
+   125  % empty list in the list
+   126  ins(A, [], [[A]]):-!.
+   127
+   128  % Combine the elements of the list into a sublist as long as the next element in
+   129  % the list is bigger than the first element in the sublist, otherwise create a
+   130  % new sublist after the initial sublist recursively in the list
+   131  ins(A, [[H|T]|T2], [[A, H|T]|T2]):-
+   132      H >= A, !.
+   133  ins(A, T2, [[A]|T2]).
+   134
+   135
+   136
+   137  % QUESTION 5:
+   138  % tree_eval(Value, Tree, Eval) :- Write a predicate tree_eval(Value, Tree, Eval)% that binds Eval to the result of evaluating the expression-tree Tree, with the% variable z set equal to the specified Value.
+   139
+   140  % When there is a number in the middle of the tree at a node that is a leaf,
+   141  % retain the numerical value and let Value be anonymous variable with no
+   142  % name, unifies to anything without any effect and be a singleton variable
+   143  tree_eval(_Num, tree(empty,X,empty), Eval) :-
+   144      number(X),
+   145      Eval is X.
+   146
+   147  % When there is a variable in the middle of the tree at a node that is a leaf,
+   148  % change the variable z into the value X inputted by the user.
+   149  tree_eval(Num, tree(empty,X,empty), Eval) :-
+   150      X=z,
+   151      Eval is Num.
+   152
+   153  % General case for recursive branches of binary tree
+   154  tree_eval(Value, tree(tree(LL,LOp,LR),Op,tree(RL,ROp,RR)), Eval) :-
+   155      tree_eval(Value, tree(LL,LOp,LR), LEval),
+   156      tree_eval(Value, tree(RL,ROp,RR), REval),
+   157      Expr=..[Op,LEval,REval],
+   158      Eval is Expr.
+
+!!section tests
+** Test 1: sumsq_div3or5([], 0) - empty list
+--------------------------------
+** Test passed
+--------------------------------
+** Test 2: sumsq_div3or5([12,3,9,6], Z) - just div3 numbers
+--------------------------------
+** Test passed
+--------------------------------
+** Test 3: sumsq_div3or5([1,5,71,1], Z) - just div5 numbers
+--------------------------------
+** Test failed (student's output on the left, expected on the right). Output difference:-
+Z = 475                                                       | Z = 250
+--------------------------------
+** Test 4: sumsq_div3or5([8,15,22], Z) - div15 numbers
+--------------------------------
+** Test failed (student's output on the left, expected on the right). Output difference:-
+Z = 2250                                                      | Z = 1125
+--------------------------------
+** Test 5: sumsq_div3or5([10,20,30,51,3,44,33], Z) - mixed numbers
+--------------------------------
+** Test failed (student's output on the left, expected on the right). Output difference:-
+Z = 5999                                                      | Z = 5099
+--------------------------------
+** Test 6: sumsq_div3or5([1...30], Z) - long list
+--------------------------------
+** Test failed (student's output on the left, expected on the right). Output difference:-
+Z = 5740                                                      | Z = 4615
+--------------------------------
+** Test 7: same_name(sophie,andrew) - daughter,father
+--------------------------------
+** Test passed
+--------------------------------
+** Test 8: same_name(andrew,anne) - grandfather,granddaughter
+--------------------------------
+** Test passed
+--------------------------------
+** Test 9: same_name(sophie,anne) - aunt,niece
+--------------------------------
+** Test failed (student's output on the left, expected on the right). Output difference:-
+false.                                                        | true.
+
+--------------------------------
+** Test 10: same_name(charles,anne) - brother,sister
+--------------------------------
+** Test passed
+--------------------------------
+** Test 11: same_name(albert,charles) - maternal grandfather
+--------------------------------
+** Test passed
+--------------------------------
+** Test 12: same_name(elizabeth,charles). - mother,son
+--------------------------------
+** Test passed
+--------------------------------
+** Test 13: log_table([1], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 14: log_table([1,4.5,12.2], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 15: log_table([1,2,3,4,5,6,7], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 16: log_table([147,21342], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 17: log_table([8000000], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 18: log_table([726.8,2107.3,6834.2], Result).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 19: runs([5], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 20: runs([1,2], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 21: runs([3,1], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 22: runs([1,4,2,3], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 23: runs([3,4,5,4,2,7,5,6,6,8,3], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 24: runs([2,1,3,5,4,3,7,6], RunList).
+--------------------------------
+** Test passed
+--------------------------------
+** Test 25: tree_eval: z
+--------------------------------
+** Test passed
+--------------------------------
+** Test 26: tree_eval: z + (1/z)
+--------------------------------
+** Test passed
+--------------------------------
+** Test 27: tree_eval: 1 + (2 * (3 - z))
+--------------------------------
+** Test passed
+--------------------------------
+** Test 28: tree_eval: ((1 + 2) * 3) - 4
+--------------------------------
+** Test passed
+--------------------------------
+** Test 29: tree_eval: 1 /( 1 + z*z )
+--------------------------------
+** Test passed
+--------------------------------
+** Test 30: tree_eval: (3 - z * 5) + (z / 7)
+--------------------------------
+** Test passed
+--------------------------------
+!!section assess
+
+!!perftab       ** PERFORMANCE ANALYSIS **
+
+Test  1 (0.25)  sumsq_div3or5([], 0) - empty list   ..  ..  ..  ..  ..  ..  !!PASSed
+Test  2 (0.25)  sumsq_div3or5([12,3,9,6], Z) - just div3 numbers .  ..  ..  !!PASSed
+Test  3 (0.25)  sumsq_div3or5([1,5,71,1], Z) - just div5 numbers .  ..  ..  !!FAILed (-0.25)
+Test  4 (0.25)  sumsq_div3or5([8,15,22], Z) - div15 numbers ..  ..  ..  ..  !!FAILed (-0.25)
+Test  5 (0.25)  sumsq_div3or5([10,20,30,51,3,44,33], Z) - mixed numbers ..  !!FAILed (-0.25)
+Test  6 (0.25)  sumsq_div3or5([1...30], Z) - long list  ..  ..  ..  ..  ..  !!FAILed (-0.25)
+Test  7 (0.2)   same_name(sophie,andrew) - daughter,father  ..  ..  ..  ..  !!PASSed
+Test  8 (0.3)   same_name(andrew,anne) - grandfather,granddaughter  ..  ..  !!PASSed
+Test  9 (0.3)   same_name(sophie,anne) - aunt,niece ..  ..  ..  ..  ..  ..  !!FAILed (-0.3)
+Test 10 (0.2)   same_name(charles,anne) - brother,sister .  ..  ..  ..  ..  !!PASSed
+Test 11 (0.2)   same_name(albert,charles) - maternal grandfather .  ..  ..  !!PASSed
+Test 12 (0.3)   same_name(elizabeth,charles). - mother,son  ..  ..  ..  ..  !!PASSed
+Test 13 (0.25)  log_table([1], Result). ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 14 (0.25)  log_table([1,4.5,12.2], Result). .  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 15 (0.25)  log_table([1,2,3,4,5,6,7], Result). ..  ..  ..  ..  ..  ..  !!PASSed
+Test 16 (0.25)  log_table([147,21342], Result). ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 17 (0.25)  log_table([8000000], Result).   ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 18 (0.25)  log_table([726.8,2107.3,6834.2], Result).   ..  ..  ..  ..  !!PASSed
+Test 19 (0.2)   runs([5], RunList). ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 20 (0.2)   runs([1,2], RunList).   ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 21 (0.2)   runs([3,1], RunList).   ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 22 (0.3)   runs([1,4,2,3], RunList).   ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 23 (0.3)   runs([3,4,5,4,2,7,5,6,6,8,3], RunList). ..  ..  ..  ..  ..  !!PASSed
+Test 24 (0.3)   runs([2,1,3,5,4,3,7,6], RunList).   ..  ..  ..  ..  ..  ..  !!PASSed
+Test 25 (0.2)   tree_eval: z .  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 26 (0.2)   tree_eval: z + (1/z) .  ..  ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 27 (0.2)   tree_eval: 1 + (2 * (3 - z)) .  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 28 (0.3)   tree_eval: ((1 + 2) * 3) - 4 .  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 29 (0.3)   tree_eval: 1 /( 1 + z*z )   ..  ..  ..  ..  ..  ..  ..  ..  !!PASSed
+Test 30 (0.3)   tree_eval: (3 - z * 5) + (z / 7) .  ..  ..  ..  ..  ..  ..  !!PASSed
+
+!!perfmark      ** TOTAL PERFORMANCE MARK:    6.5/7.5    <== mark altered (original mark was 6.2)
+
+!!marktab       **  MARKER'S  ASSESSMENT  **
+
+                          Coding / Style  (2.5) 2.5
+
+!!finalmark     **  FINAL  ASSIGNMENT  MARK:    9/10
+
+3386180 Teong, Shu Hao Ivan                     5543   COMPCS
+
+
+Marked by blair on Fri May  1 17:34:49 2015
